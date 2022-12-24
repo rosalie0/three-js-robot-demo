@@ -1,4 +1,6 @@
 import * as THREE from "three";
+// typical import
+import gsap from "gsap";
 import { degreesToRadians, random } from "./helperFunctions";
 
 const blueRobotMaterial = new THREE.MeshLambertMaterial({ color: 0x33ffff });

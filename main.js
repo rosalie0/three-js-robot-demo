@@ -1,6 +1,8 @@
 import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import gsap from "gsap";
+
 import { Robot } from "./robot";
 import { degreesToRadians } from "./helperFunctions";
 
@@ -18,7 +20,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 5;
+camera.position.z = 8;
 scene.add(camera);
 
 // create renderer & render the scene+camera
@@ -27,12 +29,13 @@ renderer.setSize(window.innerWidth / 2, window.innerHeight / 2, false);
 renderer.render(scene, camera);
 
 //****************************** Creating Light Source ***************/
-const ambientLight = new THREE.AmbientLight(0x9eaeff, 0.2);
-const spotlight = new THREE.DirectionalLight(0xffffff, 1);
-spotlight.position.set(0, 2, 2); // move spotlight
+const ambientLight = new THREE.AmbientLight(0x9eaeff, 0.4);
+const spotlight = new THREE.DirectionalLight(0xffffff, 0.7);
+spotlight.position.set(2, 2, 4); // move spotlight
 scene.add(spotlight, ambientLight);
+
 const spotlightHelper = new THREE.DirectionalLightHelper(spotlight);
-scene.add(spotlightHelper);
+// scene.add(spotlightHelper);
 
 //****************************** Creating a new robot and adding to the scene ***************/
 const myRobot = new Robot({ scene, x: -4, y: -2, ry: degreesToRadians(25) });
@@ -44,6 +47,21 @@ const anotherRobot = new Robot({
 });
 myRobot.init(); // Calls all the createBodyPart methods
 anotherRobot.init();
+
+//****************************** GSAP ***************/
+gsap.to(myRobot.params, {
+  ry: degreesToRadians(360),
+  repeat: -1,
+  duration: 20,
+});
+
+gsap.ticker.add(() => {
+  // Update the rotation value
+  myRobot.group.rotation.y = myRobot.params.ry;
+  // Render the scene
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.render(scene, camera);
+});
 
 //****************************** ANIMATION LOOP ***************/
 const controls = new OrbitControls(camera, renderer.domElement);
