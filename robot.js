@@ -10,7 +10,7 @@ const blueRobotMaterial = new THREE.MeshLambertMaterial({ color: 0x33ffff });
 // Start it with some default params
 export class Robot {
   constructor(params) {
-    const { scene } = params;
+    this.group = new THREE.Group(); // Create a 'Group'
 
     // Initialize our properties
     this.params = {
@@ -20,9 +20,14 @@ export class Robot {
       ry: 0, // 'y-axis rotation'
       ...params,
     };
-    this.group = new THREE.Group(); // Create a 'Group'
 
-    //****************************** Random Colors ***************/
+    // If coordinates and y-rotation specified via initializing, give them to this.group
+    this.group.position.x = this.params.x;
+    this.group.position.y = this.params.y;
+    this.group.position.z = this.params.z;
+    this.group.rotation.y = this.params.ry;
+
+    //****************************** Random Colors ******************************/
     this.headHue = random(0, 360); // Random value between 0 and 360
     this.bodyHue = random(0, 360);
     // Make materials based on the random color values generated
@@ -32,13 +37,12 @@ export class Robot {
     this.bodyMaterial = new THREE.MeshLambertMaterial({
       color: `hsl(${this.bodyHue}, 85%, 50%)`,
     });
+    //****************************** Create Arm Array for Animation  ******************************/
+    this.arms = [];
 
-    // If coordinates and y-rotation specified via initializing, give them to this.group
-    this.group.position.x = this.params.x;
-    this.group.position.y = this.params.y;
-    this.group.position.z = this.params.z;
-    this.group.rotation.y = this.params.ry;
+    //****************************** Add to Scene  ******************************/
 
+    const { scene } = params;
     scene.add(this.group); // Add it to given scene
   }
 
@@ -93,6 +97,7 @@ export class Robot {
       //this.group.add(box); // comment back in if needed
 
       armGroup.rotation.z = degreesToRadians(30 * multiplier); // Have arms 'stick out'
+      this.arms.push(armGroup); // Push armGroup onto 'this.arms', which is an array used for animation
     }
   }
   createEyes() {
@@ -137,5 +142,20 @@ export class Robot {
     this.createArms();
     // createEyes is called inside createHead
     this.createLegs();
+  }
+
+  // Used with gsap
+  bounce() {
+    this.group.rotation.y = this.params.ry;
+    this.group.position.y = this.params.y;
+  }
+  // Used with gsap
+  bounceWithHands() {
+    this.group.rotation.y = this.params.ry;
+    this.group.position.y = this.params.y;
+    this.arms.forEach((arm, index) => {
+      const m = index % 2 === 0 ? 1 : -1; //multiplier
+      arm.rotation.z = this.params.armRotation * m;
+    });
   }
 }

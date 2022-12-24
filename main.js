@@ -20,7 +20,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 8;
+camera.position.z = 10;
 scene.add(camera);
 
 // create renderer & render the scene+camera
@@ -38,39 +38,66 @@ const spotlightHelper = new THREE.DirectionalLightHelper(spotlight);
 // scene.add(spotlightHelper);
 
 //****************************** Creating a new robot and adding to the scene ***************/
-const myRobot = new Robot({ scene, x: -4, y: -2, ry: degreesToRadians(25) });
-const anotherRobot = new Robot({
+const robot1 = new Robot({ scene, x: -4, y: -2, ry: degreesToRadians(25) });
+const robot2 = new Robot({
+  scene,
+  x: 0,
+  y: -2,
+});
+const robot3 = new Robot({
   scene,
   x: 4,
   y: -2,
   ry: degreesToRadians(-25),
 });
-myRobot.init(); // Calls all the createBodyPart methods
-anotherRobot.init();
+robot1.init(); // Calls all the createBodyPart methods
+robot2.init();
+robot3.init();
 
 //****************************** GSAP ***************/
-gsap.to(myRobot.params, {
+//////// For Robot1
+gsap.to(robot1.params, {
   ry: degreesToRadians(360),
   repeat: -1,
   duration: 20,
 });
 
-gsap.ticker.add(() => {
-  // Update the rotation value
-  myRobot.group.rotation.y = myRobot.params.ry;
-  // Render the scene
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.render(scene, camera);
+//////// For Robot2
+// Set robot2's animation starting position
+gsap.set(robot2.params, {
+  y: -1.5,
+});
+gsap.to(robot2.params, {
+  y: 0,
+  armRotation: degreesToRadians(90),
+  repeat: -1,
+  yoyo: true, // does same animation in reverse
+  duration: 0.5,
 });
 
-//****************************** ANIMATION LOOP ***************/
-const controls = new OrbitControls(camera, renderer.domElement);
+//////// For Robot3
+gsap.to(robot3.params, {
+  y: 0,
+  armRotation: degreesToRadians(90),
+  repeat: -1,
+  yoyo: true, // does same animation in reverse
+  duration: 0.5,
+});
 
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
+//****************************** ANIMATION LOOP USING GSAP ***************/
+const controls = new OrbitControls(camera, renderer.domElement);
+gsap.ticker.add(() => {
+  robot1.group.rotation.y = robot1.params.ry; // robot1 - Update the rotation value
+  robot2.bounce(); // robot2 bounces via its class method
+
+  // robot3 bounces and moves its arms
+  robot3.bounceWithHands();
+
   controls.update(); // orbit controls
-}
-animate();
+
+  // Re-render the scene
+  renderer.setSize(window.innerWidth / 2, window.innerHeight / 2, false);
+  renderer.render(scene, camera);
+});
 
 //****************************** **************** EOF *****************************/
