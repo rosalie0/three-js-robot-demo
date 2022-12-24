@@ -9,6 +9,7 @@ import { degreesToRadians } from "./helperFunctions";
 const canvas = document.querySelector("[data-canvas]");
 
 const scene = new THREE.Scene();
+scene.background = new THREE.TextureLoader().load("/xp.jpg");
 
 // create camera
 const camera = new THREE.PerspectiveCamera(
@@ -43,7 +44,6 @@ const anotherRobot = new Robot({
 });
 myRobot.init(); // Calls all the createBodyPart methods
 anotherRobot.init();
-console.log(myRobot);
 
 //****************************** ANIMATION LOOP ***************/
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -54,3 +54,5 @@ function animate() {
   controls.update(); // orbit controls
 }
 animate();
+
+//****************************** **************** EOF *****************************/

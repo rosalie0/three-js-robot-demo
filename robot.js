@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { degreesToRadians } from "./helperFunctions";
+import { degreesToRadians, random } from "./helperFunctions";
 
 const blueRobotMaterial = new THREE.MeshLambertMaterial({ color: 0x33ffff });
 
@@ -18,8 +18,18 @@ export class Robot {
       ry: 0, // 'y-axis rotation'
       ...params,
     };
-
     this.group = new THREE.Group(); // Create a 'Group'
+
+    //****************************** Random Colors ***************/
+    this.headHue = random(0, 360); // Random value between 0 and 360
+    this.bodyHue = random(0, 360);
+    // Make materials based on the random color values generated
+    this.headMaterial = new THREE.MeshLambertMaterial({
+      color: `hsl(${this.headHue}, 30%, 50%)`,
+    });
+    this.bodyMaterial = new THREE.MeshLambertMaterial({
+      color: `hsl(${this.bodyHue}, 85%, 50%)`,
+    });
 
     // If coordinates and y-rotation specified via initializing, give them to this.group
     this.group.position.x = this.params.x;
@@ -27,7 +37,7 @@ export class Robot {
     this.group.position.z = this.params.z;
     this.group.rotation.y = this.params.ry;
 
-    scene.add(this.group); // Add it to scene
+    scene.add(this.group); // Add it to given scene
   }
 
   // Methods for creating each part of the robot
@@ -35,7 +45,7 @@ export class Robot {
     this.head = new THREE.Group(); // Create a new group for the head
 
     const geo = new THREE.BoxGeometry(1.4, 1.4, 1.4);
-    const skull = new THREE.Mesh(geo, blueRobotMaterial);
+    const skull = new THREE.Mesh(geo, this.headMaterial);
 
     this.head.add(skull); // Add the skull to our head group
     this.group.add(this.head); // Add the 'head group' to our 'this.group'
@@ -47,7 +57,7 @@ export class Robot {
   createBody() {
     this.body = new THREE.Group(); // Create a group for the body
     const geo = new THREE.BoxGeometry(1, 1.5, 1); // A 'tall' box
-    const bodyMain = new THREE.Mesh(geo, blueRobotMaterial); // make a new mesh called 'body'
+    const bodyMain = new THREE.Mesh(geo, this.bodyMaterial); // make a new mesh called 'body'
     this.body.add(bodyMain);
 
     this.group.add(this.body); // this.group gets body group
@@ -60,7 +70,7 @@ export class Robot {
       // Because the pivot point cannot be changed on this geo, we need to make a new group -
       // - add this armGroup to our 'this' and Then we can rotate the group.
       const armGroup = new THREE.Group(); // Create a group for an arm
-      const arm = new THREE.Mesh(geo, blueRobotMaterial);
+      const arm = new THREE.Mesh(geo, this.bodyMaterial);
 
       armGroup.add(arm); // add the arm to the armGroup
       this.group.add(armGroup); // ad the armGroup to the 'this.group'
@@ -78,7 +88,7 @@ export class Robot {
 
       // Visual Helper - goes at the END but before we rotate (or else positions are outdated)
       const box = new THREE.BoxHelper(armGroup, 0xffff00);
-      this.group.add(box);
+      //this.group.add(box); // comment back in if needed
 
       armGroup.rotation.z = degreesToRadians(30 * multiplier); // Have arms 'stick out'
     }
@@ -108,13 +118,12 @@ export class Robot {
 
     // Loop for making each leg
     for (let i = 0; i < 2; ++i) {
-      const leg = new THREE.Mesh(geo, blueRobotMaterial);
+      const leg = new THREE.Mesh(geo, this.bodyMaterial);
       const m = i % 2 === 0 ? 1 : -1; // multiplier for left/right adjusting
 
       legs.add(leg);
       leg.position.x = m * 0.22; // each leg positioned horizontally
     }
-    console.log(legs);
     legs.position.y = -1; // position (both) legs on y-axis
     this.group.add(legs); // attach the legs group to 'this.group'
     this.body.add(legs); // attach legs to body (will make moving stuff easier)
