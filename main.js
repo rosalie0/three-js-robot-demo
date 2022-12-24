@@ -38,11 +38,16 @@ mesh.rotation.y = degreesToRadians(45);
 scene.add(mesh);
 
 //****************************** Creating Light Source ***************/
+const ambientLight = new THREE.AmbientLight(0x9eaeff, 0.2);
 const spotlight = new THREE.DirectionalLight(0xffffff, 1);
 spotlight.position.set(0, 2, 2); // move spotlight
-scene.add(spotlight);
+scene.add(spotlight, ambientLight);
 const spotlightHelper = new THREE.DirectionalLightHelper(spotlight);
 scene.add(spotlightHelper);
 
-// FINALLY -  Re render all the stuff we added!
-renderer.render(scene, camera);
+// FINALLY -  animate loop
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
