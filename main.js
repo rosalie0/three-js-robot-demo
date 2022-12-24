@@ -34,8 +34,15 @@ const spotlightHelper = new THREE.DirectionalLightHelper(spotlight);
 scene.add(spotlightHelper);
 
 //****************************** Creating a new robot and adding to the scene ***************/
-const myRobot = new Robot({ scene });
-myRobot.init();
+const myRobot = new Robot({ scene, x: -4, y: -2, ry: degreesToRadians(25) });
+const anotherRobot = new Robot({
+  scene,
+  x: 4,
+  y: -2,
+  ry: degreesToRadians(-25),
+});
+myRobot.init(); // Calls all the createBodyPart methods
+anotherRobot.init();
 console.log(myRobot);
 
 //****************************** ANIMATION LOOP ***************/

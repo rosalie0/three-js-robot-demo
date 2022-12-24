@@ -9,16 +9,24 @@ const blueRobotMaterial = new THREE.MeshLambertMaterial({ color: 0x33ffff });
 export class Robot {
   constructor(params) {
     const { scene } = params;
-    // used later to position the chr
+
+    // Initialize our properties
     this.params = {
       x: 0,
       y: 0,
       z: 0,
-      ry: 0,
+      ry: 0, // 'y-axis rotation'
       ...params,
     };
 
     this.group = new THREE.Group(); // Create a 'Group'
+
+    // If coordinates and y-rotation specified via initializing, give them to this.group
+    this.group.position.x = this.params.x;
+    this.group.position.y = this.params.y;
+    this.group.position.z = this.params.z;
+    this.group.rotation.y = this.params.ry;
+
     scene.add(this.group); // Add it to scene
   }
 
