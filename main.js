@@ -67,8 +67,7 @@ class Robot {
 
   // Methods for creating each part of the robot
   createHead() {
-    // Create a new group for the head
-    this.head = new THREE.Group();
+    this.head = new THREE.Group(); // Create a new group for the head
 
     const geo = new THREE.BoxGeometry(1.4, 1.4, 1.4);
     const skull = new THREE.Mesh(geo, blueRobotMaterial);
@@ -81,10 +80,12 @@ class Robot {
     this.createEyes(); // Create eyes
   }
   createBody() {
+    this.body = new THREE.Group(); // Create a group for the body
     const geo = new THREE.BoxGeometry(1, 1.5, 1); // A 'tall' box
-    const body = new THREE.Mesh(geo, blueRobotMaterial); // make a new mesh called 'body'
-    body.name = "robot body"; // not needed but for organizing/debugging w console logs
-    this.group.add(body); // Add it to this Robot's group.
+    const bodyMain = new THREE.Mesh(geo, blueRobotMaterial); // make a new mesh called 'body'
+    this.body.add(bodyMain);
+
+    this.group.add(this.body); // this.group gets body group
   }
   createArms() {
     const height = 1; // Used for positioning the 'transform origin'
@@ -136,12 +137,30 @@ class Robot {
     // it might be a good idea to create a variable to do this!
     eyes.position.z = 0.7;
   }
+  createLegs() {
+    const legs = new THREE.Group(); // create legs group
+    const geo = new THREE.BoxGeometry(0.25, 0.4, 0.25); // create geo for legs
+
+    // Loop for making each leg
+    for (let i = 0; i < 2; ++i) {
+      const leg = new THREE.Mesh(geo, blueRobotMaterial);
+      const m = i % 2 === 0 ? 1 : -1; // multiplier for left/right adjusting
+
+      legs.add(leg);
+      leg.position.x = m * 0.22; // each leg positioned horizontally
+    }
+    console.log(legs);
+    legs.position.y = -1; // position (both) legs on y-axis
+    this.group.add(legs); // attach the legs group to 'this.group'
+    this.body.add(legs); // attach legs to body (will make moving stuff easier)
+  }
   // Method that Initializes the figure (call all the 'creates' methods)
   init() {
     this.createHead();
     this.createBody();
     this.createArms();
     // createEyes is called inside createHead
+    this.createLegs();
   }
 }
 
